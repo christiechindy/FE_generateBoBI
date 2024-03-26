@@ -82,7 +82,7 @@ const page = () => {
             </div>
             <div className="content">
                 {!file && <label className={`dropPdf ${draggingOver ? "dragging" : ""}`} onDrop={handleDrop} onDragOver={handleDragOver} onClick={(e) => console.log(e)}>
-                    <PdfIcon color={draggingOver ? "#420000" : "#B8B8B8"} />
+                    <PdfIcon color={draggingOver ? "#1300F3" : "#0070F3"} />
                     <input type="file" accept="application/pdf" className="pdfInput" onChange={(e) => {
                         if (!e.target.files) return;
                         setFile(e.target.files[0]);
