@@ -30,10 +30,6 @@ const page = () => {
         e.preventDefault();
     }
 
-    const cancelHandler = () => {
-        setFile(undefined);
-    }
-
     /* --- Form ------------------ */
     const [terlangkah, setTerlangkah] = useState<boolean|undefined>();
     const [stepOnMiddle, setStepOnMiddle] = useState<boolean|undefined>();
@@ -71,6 +67,14 @@ const page = () => {
         document.body.removeChild(link);
 
         setLoading(false);
+    }
+
+    const cancelHandler = () => {
+        setFile(undefined);
+        setJudul("");
+        setTerlangkah(undefined);
+        setStepOnMiddle(undefined);
+        setJsonFile(undefined);
     }
 
     useEffect(() => {
