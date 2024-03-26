@@ -3,6 +3,7 @@ import FileIcon from "@/Icons/FileIcon";
 import PdfIcon from "@/Icons/PdfIcon";
 import UploadIcon from "@/Icons/UploadIcon";
 import XIcon from "@/Icons/XIcon";
+import LoadingButton from "@/components/LoadingButton";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import React from "react";
@@ -37,8 +38,11 @@ const page = () => {
     const [terlangkah, setTerlangkah] = useState<boolean|undefined>();
     const [stepOnMiddle, setStepOnMiddle] = useState<boolean|undefined>();
 
+    const [loading, setLoading] = useState<boolean>(false);
     const processTheBook = async () => {
-        const fileName = "tesssr.docx"
+        setLoading(true);
+
+        const fileName = `Index ${judul}.docx`
         const formData = new FormData();
         formData.append("filePdf", file);
         formData.append("judul", judul);
@@ -65,6 +69,8 @@ const page = () => {
 
         // Remove the link from the document
         document.body.removeChild(link);
+
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -161,7 +167,9 @@ const page = () => {
                                 </div>
                             </div>
                             
-                            <button className="processBtn" onClick={processTheBook}>Proses</button>
+                            <button className="processBtn" onClick={processTheBook} disabled={loading}>
+                                {loading ? <LoadingButton/> : "Proses"}
+                            </button>
                         </div>
                     </div>
                 }
