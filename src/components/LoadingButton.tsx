@@ -5,7 +5,7 @@ interface IProps {
     color?: string
 }
 
-const LoadingButton = ({size=16, color="#B2E6E8"}: IProps) => {
+const LoadingButton = ({size=17, color="#B2E6E8"}: IProps) => {
     return (
         <Oval
             height={size}
