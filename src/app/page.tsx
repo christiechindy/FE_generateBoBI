@@ -3,11 +3,14 @@ import FileIcon from "@/Icons/FileIcon";
 import PdfIcon from "@/Icons/PdfIcon";
 import UploadIcon from "@/Icons/UploadIcon";
 import XIcon from "@/Icons/XIcon";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import React from "react";
 
 const page = () => {
     const [file, setFile] = useState<any>();
+    const [jsonFile, setJsonFile] = useState<any>();
+    const [judul, setJudul] = useState<string>("");
     const [draggingOver, setDraggingOver] = useState<boolean>(false)
     const [XOver, setXOver] = useState<boolean>(false);
 
@@ -33,6 +36,36 @@ const page = () => {
     /* --- Form ------------------ */
     const [terlangkah, setTerlangkah] = useState<boolean|undefined>();
     const [stepOnMiddle, setStepOnMiddle] = useState<boolean|undefined>();
+
+    const processTheBook = async () => {
+        const fileName = "tesssr.docx"
+        const formData = new FormData();
+        formData.append("filePdf", file);
+        formData.append("judul", judul);
+        formData.append("adaJSON", "1");
+        formData.append("fileJson", jsonFile);
+
+        const response = await axios({
+            url: "http://localhost:1313/generate-rake",
+            method: "POST",
+            responseType: "blob",
+            data: formData
+        })
+        const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    
+        // Create a download link
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', fileName);
+
+        // Append the link to the document and trigger the click event
+        document.body.appendChild(link);
+        link.click();
+
+        // Remove the link from the document
+        document.body.removeChild(link);
+    }
 
     useEffect(() => {
         if (file) {
@@ -72,7 +105,7 @@ const page = () => {
                                 <div className="fields">
                                     <div className="row">
                                         <label htmlFor="judulBuku">Judul Buku</label>
-                                        <input type="text" id="judulBuku" className="input" />
+                                        <input type="text" id="judulBuku" className="input" value={judul} onChange={e => setJudul(e.target.value)} />
                                     </div>
                                     <div className="row">
                                         <label className="label_lihe">Apakah ada nomor halaman yang terlangkah?</label>
@@ -114,10 +147,13 @@ const page = () => {
                                             <div className="row">
                                                 <label htmlFor="jsonfile" className="label_lihe">Unggah JSON file berisi range halaman tiap bab/section dan selisih nomor halaman yang dilabeli dan urutan halaman keseluruhan</label>
                                                 <a href="/halaman.json" download="halaman.json" className="linkjsonformat">(download format JSON file)</a>
-                                                <input type="file" id="jsonfile" />
+                                                <input type="file" accept="application/json" id="jsonfile" onChange={(e) => {
+                                                    if (!e.target.files) return;
+                                                    setJsonFile(e.target.files[0]);
+                                                }} />
                                                 <label htmlFor="jsonfile" className="input file">
                                                     <UploadIcon />
-                                                    <div>Unggah file json yang sudah diisi</div>
+                                                    <div>{!jsonFile?.name ? "Unggah file json yang sudah diisi" : jsonFile.name}</div>
                                                 </label>
                                             </div>
                                     : null}
@@ -125,7 +161,7 @@ const page = () => {
                                 </div>
                             </div>
                             
-                            <button className="processBtn">Proses</button>
+                            <button className="processBtn" onClick={processTheBook}>Proses</button>
                         </div>
                     </div>
                 }
