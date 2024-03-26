@@ -297,7 +297,12 @@ input.pdfInput {
     transition: 0.5s ease-in-out;
 }
 
-.processBtn:hover {
+.processBtn:hover:not(:disabled) {
     cursor: pointer;
     filter: drop-shadow(0 0 15px var(--blue));
+}
+
+.processBtn:disabled {
+    cursor: not-allowed;
+    background-color: #c8e2ff;
 }
