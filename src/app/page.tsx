@@ -1,6 +1,7 @@
 "use client";
 import FileIcon from "@/Icons/FileIcon";
 import PdfIcon from "@/Icons/PdfIcon";
+import TriangleIcon from "@/Icons/TriangleIcon";
 import UploadIcon from "@/Icons/UploadIcon";
 import XIcon from "@/Icons/XIcon";
 import LoadingButton from "@/components/LoadingButton";
@@ -30,9 +31,18 @@ const page = () => {
         e.preventDefault();
     }
 
+    /* --- Hover display keterangan nomor VS urutan halaman ------ */
+    const [hoverNomor, setHoverNomor] = useState<boolean>(false);
+    const [hoverUrutan, setHoverUrutan] = useState<boolean>(false);
+
     /* --- Form ------------------ */
     const [terlangkah, setTerlangkah] = useState<boolean|undefined>();
     const [stepOnMiddle, setStepOnMiddle] = useState<boolean|undefined>();
+
+    // without JSON input:
+    const [firstPage, setFirstPage] = useState<number>();
+    const [lastPage, setLastPage] = useState<number>();
+    const [urutanPertama, setUrutanPertama] = useState<number>();
 
     const [loading, setLoading] = useState<boolean>(false);
     const processTheBook = async () => {
@@ -43,7 +53,16 @@ const page = () => {
         formData.append("filePdf", file);
         formData.append("judul", judul);
         formData.append("adaJSON", "1");
-        formData.append("fileJson", jsonFile);
+        if (terlangkah || stepOnMiddle) {
+            formData.append("fileJson", jsonFile);
+        } else {
+            const generatedJSONtext = JSON.stringify([
+                {"f": firstPage, "l": lastPage, "d": (urutanPertama! - firstPage!)}
+            ]);
+            const encoder = new TextEncoder();
+            const binaryData = encoder.encode(generatedJSONtext);
+            formData.append("fileJson", new Blob([binaryData], { type: 'application/octet-stream' }));
+        }
 
         const response = await axios({
             url: "http://localhost:1313/generate-rake",
@@ -145,14 +164,34 @@ const page = () => {
                                     </div>
                                     {(terlangkah!==undefined && stepOnMiddle!==undefined) ?
                                         terlangkah===false && stepOnMiddle===false ?
-                                            <div className="row">
-                                                <label htmlFor="halaman">Halaman yang ingin dibuatkan indeks</label>
-                                                <div className="halamanInp">
-                                                    <input type="number" className="input" />
-                                                    <div>-</div>
-                                                    <input type="number" className="input" />
+                                            <>
+                                                <div className="row" onMouseOver={() => setHoverNomor(true)} onMouseLeave={() => setHoverNomor(false)}>
+                                                    <label>Nomor halaman yang ingin dibuatkan indeks</label>
+                                                    <div className="halamanInp">
+                                                        <input type="number" className="input" value={firstPage} onChange={e => setFirstPage(Number(e.target.value))} />
+                                                        <div>-</div>
+                                                        <input type="number" className="input" value={lastPage} onChange={e => setLastPage(Number(e.target.value))}/>
+                                                    </div>
+                                                    {
+                                                        hoverNomor ? 
+                                                        <div className="tooltip">
+                                                            <div className="text">Nomor halaman adalah nomor yang diberikan pada suatu halaman oleh penulis</div>
+                                                            <TriangleIcon />
+                                                        </div> : null
+                                                    }
                                                 </div>
-                                            </div>
+                                                <div className="row" onMouseOver={() => setHoverUrutan(true)} onMouseLeave={() => setHoverUrutan(false)}>
+                                                    <label>Urutan halaman pertama yang ingin diindeks</label>
+                                                    <input type="number" className="input" value={urutanPertama} onChange={e => setUrutanPertama(Number(e.target.value))} />
+                                                    {
+                                                        hoverUrutan ? 
+                                                        <div className="tooltip">
+                                                            <div className="text">Urutan halaman mengacu pada susunan halaman dalam file (dokumen)</div>
+                                                            <TriangleIcon />
+                                                        </div> : null
+                                                    }
+                                                </div>
+                                            </>
                                         :
                                             <div className="row">
                                                 <label htmlFor="jsonfile" className="label_lihe">Unggah JSON file berisi range halaman tiap bab/section dan selisih nomor halaman yang dilabeli dan urutan halaman keseluruhan</label>
