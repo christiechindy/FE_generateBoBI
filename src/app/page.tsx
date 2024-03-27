@@ -99,6 +99,34 @@ const page = () => {
         setUrutanPertama(undefined);
     }
 
+    const checkFormComplete = () => {
+        let value = false;
+
+        // basic requirement
+        if (!file || !judul || terlangkah===undefined || stepOnMiddle===undefined) {
+            value = false;
+        } else {
+            // without JSON
+            if (terlangkah===false && stepOnMiddle===false) {
+                if (firstPage===undefined || lastPage===undefined || urutanPertama===undefined) {
+                    value = false;
+                } else {
+                    value = true;
+                }
+            } 
+            // with JSON
+            else {
+                if (!jsonFile) {
+                    value = false;
+                } else {
+                    value = true;
+                }
+            }
+        }
+
+        return value;
+    }
+
     useEffect(() => {
         if (file) {
             const pdf = window.URL.createObjectURL(file);
@@ -213,9 +241,11 @@ const page = () => {
                                 </div>
                             </div>
                             
-                            <button className="processBtn" onClick={processTheBook} disabled={loading}>
-                                {loading ? <LoadingButton/> : "Proses"}
-                            </button>
+                            {checkFormComplete() ?
+                                <button className="processBtn" onClick={processTheBook} disabled={loading}>
+                                    {loading ? <LoadingButton/> : "Proses"}
+                                </button>
+                            : null}
                         </div>
                     </div>
                 }
