@@ -94,6 +94,9 @@ const page = () => {
         setTerlangkah(undefined);
         setStepOnMiddle(undefined);
         setJsonFile(undefined);
+        setFirstPage(undefined);
+        setLastPage(undefined);
+        setUrutanPertama(undefined);
     }
 
     useEffect(() => {
